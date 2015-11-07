@@ -2,18 +2,24 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Tornado Serpisori Spectator</title>
-    <link rel="stylesheet" href="{{ static_url('app.css') }}" type="text/css">
+    <title>Spectator</title>
+    <link rel="stylesheet" href="{{ static_url('spectator/css/style.css') }}">
   </head>
   <body>
-    <div id="body">
-      <div id="inbox">
-
-      </div>
-    </div>
     <script src="{{ static_url('jquery.min.js') }}" type="text/javascript"></script>
     <script src="{{ static_url('gyro.min.js') }}"></script>
-    <script src="{{ static_url('spectator.js') }}" type="text/javascript"></script>
+
+    <script src="{{ static_url('spectator/lib/phaser.min.js') }}"></script>
+    <script src="{{ static_url('spectator/js/math-utils.js') }}"></script>
+    <script src="{{ static_url('spectator/js/boot.js') }}"></script>
+    <script src="{{ static_url('spectator/js/load.js') }}"></script>
+    <script src="{{ static_url('spectator/js/play.js') }}"></script>
+    <script src="{{ static_url('spectator/js/stateManager.js') }}"></script>
+
+    <script src="{{ static_url('spectator/plugins/phaser-debug.js') }}"></script>
+    <script src="{{ static_url('spectator/plugins/phaser-inspector.min.js') }}"></script>
+
+    <div id="gameContainer"></div>
 
   </body>
 </html>
