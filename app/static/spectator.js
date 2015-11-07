@@ -4,8 +4,6 @@ $(document).ready(function() {
 });
 
 
-
-
 var updater = {
     socket: null,
 
