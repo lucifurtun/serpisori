@@ -18,7 +18,7 @@ var updater = {
     },
 
     showMessage: function(message) {
-
+        console.clear();
         //$("#inbox").append("<div>" + message + "</div>");
         console.log(message);
     }

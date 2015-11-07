@@ -1,7 +1,7 @@
 
 $(document).ready(function() {
     updater.start();
-    gyro.frequency = 1000;
+    gyro.frequency = 100;
     var output = null;
     gyro.startTracking(function(o) {
 
@@ -11,15 +11,12 @@ $(document).ready(function() {
 
     setInterval(function(){
         sendCoordinates(output);
-    }, 1000);
+    }, 100);
 
 });
 
 function sendCoordinates(o) {
     var coordinates = {
-        x: o.x,
-        y: o.y,
-        z: o.z,
         alpha: o.alpha,
         beta: o.beta,
         gamma: o.gamma
