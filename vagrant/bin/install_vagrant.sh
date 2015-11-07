@@ -62,6 +62,7 @@ function config_nginx {
 function config_supervisor {
     checkpoint "Configuring Supervisor ..."
     cp /vagrant/supervisor/serpisori.conf /etc/supervisor/conf.d/
+    cp /vagrant/supervisor/serpisori_debug.conf /etc/supervisor/conf.d/
     supervisorctl reread
     supervisorctl update
 }
@@ -69,6 +70,7 @@ function config_supervisor {
 function restart_tornado {
     checkpoint "Restarting tornado with supervisor ..."
     supervisorctl restart serpisori
+    supervisorctl restart serpisori_debug
 }
 
 function setup_virtualenv {
