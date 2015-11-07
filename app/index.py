@@ -33,23 +33,12 @@ class Application(tornado.web.Application):
 
     def get_handlers(self):
         handlers = [
-            (r"/", MainHandler),
-            (r"/client", ClientHandler),
+            (r"/", PlayerHandler),
             (r"/chatsocket", ChatSocketHandler),
             (r"/player", PlayerHandler),
             (r"/spectator", SpectatorHandler),
         ]
         return handlers
-
-
-class MainHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.render("index.html", messages=ChatSocketHandler.cache)
-
-
-class ClientHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.render("client.html", messages=ChatSocketHandler.cache)
 
 
 class PlayerHandler(tornado.web.RequestHandler):
