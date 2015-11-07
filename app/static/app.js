@@ -13,6 +13,15 @@
 // under the License.
 
 $(document).ready(function() {
+//    updater.start();
+//    gyro.frequency = 1000;
+//    gyro.startTracking(function(o) {
+//
+//        sendCoordinates(o);
+//
+//        return false;
+//    });
+
     if (!window.console) window.console = {};
     if (!window.console.log) window.console.log = function() {};
 
@@ -27,8 +36,21 @@ $(document).ready(function() {
         }
     });
     $("#message").select();
-    updater.start();
+//    updater.start();
 });
+
+function sendCoordinates(o) {
+    var coordinates = {
+        x: o.x,
+        y: o.y,
+        z: o.z,
+        alpha: o.alpha,
+        beta: o.beta,
+        gamma: o.gamma
+    }
+
+    updater.socket.send(JSON.stringify(coordinates));
+}
 
 function newMessage(form) {
     var message = form.formToDict();
@@ -58,11 +80,6 @@ var updater = {
     },
 
     showMessage: function(message) {
-        var existing = $("#m" + message.id);
-        if (existing.length > 0) return;
-        var node = $(message.html);
-        node.hide();
-        $("#inbox").append(node);
-        node.slideDown();
+        $("#inbox").append(message.html);
     }
 };

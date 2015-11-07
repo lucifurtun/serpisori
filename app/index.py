@@ -22,6 +22,8 @@ class Application(tornado.web.Application):
             (r"/", MainHandler),
             (r"/client", ClientHandler),
             (r"/chatsocket", ChatSocketHandler),
+            (r"/player", PlayerHandler),
+            (r"/spectator", SpectatorHandler),
         ]
         settings = dict(
             cookie_secret="__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__",
@@ -40,6 +42,16 @@ class MainHandler(tornado.web.RequestHandler):
 class ClientHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("client.html", messages=ChatSocketHandler.cache)
+
+
+class PlayerHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("player.html", messages=ChatSocketHandler.cache)
+
+
+class SpectatorHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("spectator.html", messages=ChatSocketHandler.cache)
 
 
 class ChatSocketHandler(tornado.websocket.WebSocketHandler):
@@ -74,16 +86,9 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
 
     def on_message(self, message):
         logging.info("got message %r", message)
-        parsed = tornado.escape.json_decode(message)
-        chat = {
-            "id": str(uuid.uuid4()),
-            "body": parsed["body"],
-            }
-        chat["html"] = tornado.escape.to_basestring(
-            self.render_string("message.html", message=chat))
 
-        ChatSocketHandler.update_cache(chat)
-        ChatSocketHandler.send_updates(chat)
+        ChatSocketHandler.update_cache(message)
+        ChatSocketHandler.send_updates(message)
 
 
 def main():
