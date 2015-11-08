@@ -67,6 +67,7 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
         ChatSocketHandler.waiters.add(self)
 
     def on_close(self):
+        logging.debug("On close fired for id %s", self.client_id)
         ChatSocketHandler.waiters.remove(self)
 
     @classmethod
@@ -89,9 +90,10 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
         message_dict = tornado.escape.json_decode(message)
         data_type = message_dict.get("type", "data")
         if "join" == data_type:
+            waiter.set_client_id()
             message_dict["name"] = "Player%d" % random.randint(1, 1000)
 
-        message_dict["id"] = cls.get_client_id(waiter)
+        message_dict["id"] = waiter.get_client_id()
         waiter.write_message(message_dict)
 
     def on_message(self, message):
@@ -99,9 +101,10 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
 
         ChatSocketHandler.send_updates(message)
 
+    def set_client_id(self):
+        self.client_id = str(uuid.uuid4())
+
     def get_client_id(self):
-        if not self.client_id:
-            self.client_id = str(uuid.uuid4())
         return self.client_id
 
 
