@@ -1,5 +1,11 @@
 # serpisori
-Multiplayer snake game
+Multiplayer snake game - experiment.
+
+Join at:
+
+# serpisori.sensidev.com
+
+
 
 # Vagrant environment
 
