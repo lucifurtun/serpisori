@@ -15,10 +15,9 @@ $(document).ready(function() {
 
 function sendCoordinates(o) {
     var coordinates = {
-        alpha: o.alpha,
         beta: o.beta,
         gamma: o.gamma
-    }
+    };
 
     updater.socket.send(JSON.stringify(coordinates));
     console.log(JSON.stringify(coordinates));

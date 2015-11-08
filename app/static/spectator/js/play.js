@@ -12,11 +12,11 @@ var playState = {
         var url = "ws://" + location.host + "/chatsocket";
         this.socket = new WebSocket(url);
         this.socket.onmessage = function (event) {
-            //updater.showMessage(event.data);
             self.positionFromClient = self.getObjectFromGyroString(event.data);
             self.nextDirectionFromClient = self.getDirectionFromGyroData();
             console.clear();
             console.log(self.nextDirectionFromClient);
+            console.log(event.data);
         }
     },
     getObjectFromGyroString: function (gyroData) {

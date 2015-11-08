@@ -3,14 +3,14 @@ Entry point for Tornado.
 """
 
 import logging
+import uuid
+
+import os.path
 import tornado.escape
 import tornado.ioloop
 import tornado.options
 import tornado.web
 import tornado.websocket
-import os.path
-import uuid
-
 from tornado.options import define, options
 
 define("port", default=8888, help="run on the given port", type=int)
@@ -55,6 +55,7 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
     waiters = set()
     cache = []
     cache_size = 200
+    client_uuid = None
 
     def get_compression_options(self):
         # Non-None enables compression with default options.
@@ -67,25 +68,36 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
         ChatSocketHandler.waiters.remove(self)
 
     @classmethod
-    def update_cache(cls, chat):
-        cls.cache.append(chat)
+    def update_cache(cls, message):
+        cls.cache.append(message)
         if len(cls.cache) > cls.cache_size:
             cls.cache = cls.cache[-cls.cache_size:]
 
     @classmethod
-    def send_updates(cls, chat):
+    def send_updates(cls, message):
         logging.info("sending message to %d waiters", len(cls.waiters))
         for waiter in cls.waiters:
             try:
-                waiter.write_message(chat)
+                cls.write_message_for_waiter(waiter, message)
             except:
                 logging.error("Error sending message", exc_info=True)
+
+    @classmethod
+    def write_message_for_waiter(cls, waiter, message):
+        message_dict = tornado.escape.json_decode(message)
+        message_dict['uuid'] = cls.get_client_uuid()
+        waiter.write_message(message_dict)
 
     def on_message(self, message):
         logging.info("got message %r", message)
 
-        ChatSocketHandler.update_cache(message)
         ChatSocketHandler.send_updates(message)
+
+    @classmethod
+    def get_client_uuid(cls):
+        if not cls.client_uuid:
+            cls.client_uuid = str(uuid.uuid4())
+        return cls.client_uuid
 
 
 def main():
