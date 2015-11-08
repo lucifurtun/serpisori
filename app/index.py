@@ -56,6 +56,7 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
     cache = []
     cache_size = 200
     client_uuid = None
+    client_count = 0
 
     def get_compression_options(self):
         # Non-None enables compression with default options.
@@ -63,9 +64,20 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         ChatSocketHandler.waiters.add(self)
+        message_dict = {
+            "id": self.get_client_uuid(),
+            "type": "join",
+            "name": "Player%d" % ++self.client_count
+        }
+        self.write_message(message_dict)
 
     def on_close(self):
         ChatSocketHandler.waiters.remove(self)
+        message_dict = {
+            "id": self.get_client_uuid(),
+            "type": "leave",
+        }
+        self.write_message(message_dict)
 
     @classmethod
     def update_cache(cls, message):
@@ -85,7 +97,8 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
     @classmethod
     def write_message_for_waiter(cls, waiter, message):
         message_dict = tornado.escape.json_decode(message)
-        message_dict['id'] = cls.get_client_uuid()
+        message_dict["id"] = cls.get_client_uuid()
+        message_dict["type"] = "data"
         waiter.write_message(message_dict)
 
     def on_message(self, message):
