@@ -3,7 +3,6 @@ Entry point for Tornado.
 """
 
 import logging
-import random
 import uuid
 
 import os.path
@@ -52,6 +51,7 @@ class SpectatorHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("spectator.html", messages=ChatSocketHandler.cache)
 
+
 class PlayerInterfaceHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("player_interface.html", messages=ChatSocketHandler.cache)
@@ -69,6 +69,12 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
         return {}
 
     def open(self):
+        self.set_client_id()
+        message_dict = {
+            "type": "join",
+            "id": self.get_client_id(),
+        }
+        self.write_message(message_dict)
         ChatSocketHandler.waiters.add(self)
 
     def on_close(self):
@@ -92,13 +98,10 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
 
     @classmethod
     def write_message_for_waiter(cls, waiter, message):
+        """
+        Placeholder to inject more data in the message.
+        """
         message_dict = tornado.escape.json_decode(message)
-        data_type = message_dict.get("type", "data")
-        if "join" == data_type:
-            waiter.set_client_id()
-            message_dict["name"] = "Player%d" % random.randint(1, 1000)
-
-        message_dict["id"] = waiter.get_client_id()
         waiter.write_message(message_dict)
 
     def on_message(self, message):
