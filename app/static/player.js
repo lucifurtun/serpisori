@@ -1,4 +1,3 @@
-
 $(document).ready(function() {
     updater.start();
     gyro.frequency = 100;
@@ -30,11 +29,16 @@ var updater = {
         var url = "ws://" + location.host + "/chatsocket";
         updater.socket = new WebSocket(url);
         updater.socket.onmessage = function(event) {
-            updater.showMessage(JSON.parse(event.data));
-        }
-    },
-
-    showMessage: function(message) {
-//        $("#inbox").html(message);
+        };
+        updater.socket.onopen = function () {
+            updater.socket.send(JSON.stringify({
+                "type": "join"
+            }))
+        };
+        updater.socket.onclose = function () {
+            updater.socket.send(JSON.stringify({
+                "type": "leave"
+            }))
+        };
     }
 };

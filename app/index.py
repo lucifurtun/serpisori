@@ -3,6 +3,7 @@ Entry point for Tornado.
 """
 
 import logging
+import random
 import uuid
 
 import os.path
@@ -55,7 +56,7 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
     waiters = set()
     cache = []
     cache_size = 200
-    client_uuid = None
+    client_id = None
     client_count = 0
 
     def get_compression_options(self):
@@ -64,20 +65,9 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         ChatSocketHandler.waiters.add(self)
-        message_dict = {
-            "id": self.get_client_uuid(),
-            "type": "join",
-            "name": "Player%d" % ++self.client_count
-        }
-        self.write_message(message_dict)
 
     def on_close(self):
         ChatSocketHandler.waiters.remove(self)
-        message_dict = {
-            "id": self.get_client_uuid(),
-            "type": "leave",
-        }
-        self.write_message(message_dict)
 
     @classmethod
     def update_cache(cls, message):
@@ -97,8 +87,11 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
     @classmethod
     def write_message_for_waiter(cls, waiter, message):
         message_dict = tornado.escape.json_decode(message)
-        message_dict["id"] = cls.get_client_uuid()
-        message_dict["type"] = "data"
+        data_type = message_dict.get("type", "data")
+        if "join" == data_type:
+            message_dict["name"] = "Player%d" % random.randint(1, 1000)
+
+        message_dict["id"] = cls.get_client_id(waiter)
         waiter.write_message(message_dict)
 
     def on_message(self, message):
@@ -106,11 +99,10 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
 
         ChatSocketHandler.send_updates(message)
 
-    @classmethod
-    def get_client_uuid(cls):
-        if not cls.client_uuid:
-            cls.client_uuid = str(uuid.uuid4())
-        return cls.client_uuid
+    def get_client_id(self):
+        if not self.client_id:
+            self.client_id = str(uuid.uuid4())
+        return self.client_id
 
 
 def main():
