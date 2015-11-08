@@ -85,7 +85,7 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
     @classmethod
     def write_message_for_waiter(cls, waiter, message):
         message_dict = tornado.escape.json_decode(message)
-        message_dict['uuid'] = cls.get_client_uuid()
+        message_dict['id'] = cls.get_client_uuid()
         waiter.write_message(message_dict)
 
     def on_message(self, message):
