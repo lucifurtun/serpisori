@@ -1,4 +1,5 @@
 
+
 function sendCoordinates(o) {
     var coordinates = {
         beta: o.beta,
@@ -8,26 +9,37 @@ function sendCoordinates(o) {
     updater.socket.send(JSON.stringify(coordinates));
 }
 
+function sendData(o) {
+    if (!updater.playerId) {
+        return
+    }
+
+    var coordinates = {
+        id: updater.playerId,
+        beta: o.beta,
+        gamma: o.gamma
+    };
+
+    updater.socket.send(JSON.stringify(coordinates));
+    console.log(JSON.stringify(coordinates));
+}
+
 var updater = {
     socket: null,
+    playerId: null,
 
-    start: function() {
+    start: function () {
         var url = "ws://" + location.host + "/chatsocket";
         updater.socket = new WebSocket(url);
-        updater.socket.onmessage = function(event) {
-        };
-        updater.socket.onopen = function () {
-            updater.socket.send(JSON.stringify({
-                "type": "join"
-            }))
-        };
-        updater.socket.onclose = function () {
-            updater.socket.send(JSON.stringify({
-                "type": "leave"
-            }))
+        updater.socket.onmessage = function (event) {
+            var data = JSON.parse(event.data);
+            if ("join" === data.type) {
+                updater.playerId = data.id;
+            }
         };
     }
 };
+
 
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -187,13 +199,10 @@ var updater = {
 
     resetElement();
     updater.start();
-    var output = {
-        beta: 0,
-        gamma: 0,
-    };
+    var output = null;
 
     setInterval(function(){
-        sendCoordinates(output);
+        sendData(output);
     }, 100);
 
 
