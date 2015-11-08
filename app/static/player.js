@@ -9,6 +9,11 @@ $(document).ready(function () {
     var output = null;
     gyro.startTracking(function (o) {
         output = o;
+
+        if(!o.beta  || !o.gamma ) {
+            window.location = '/player-interface';
+        }
+
         return false;
     });
 
