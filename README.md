@@ -3,7 +3,7 @@ Multiplayer snake game - experiment.
 
 Join at:
 
-# serpisori.sensidev.com
+# http://serpisori.sensidev.com
 
 
 
