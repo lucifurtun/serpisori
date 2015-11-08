@@ -17,10 +17,17 @@ function Vector(p1, p2) {
 function Point(x, y) {
     this.x = x;
     this.y = y;
+}
 
-    this.addVector = function (v) {
-        this.x += v.x;
-        this.y += v.y;
-    };
-    this.direction = null;
+function getLineDistance(p1, p2) {
+    var xs;
+    var ys;
+
+    xs = p2.x - p1.x;
+    xs = xs * xs;
+
+    ys = p2.y - p1.y;
+    ys = ys * ys;
+
+    return Math.sqrt(xs + ys);
 }

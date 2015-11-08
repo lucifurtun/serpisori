@@ -1,30 +1,55 @@
 var playState = {
     sprite: null,
-    bmd: null,
-    snakeBmd: null,
-    currentDirection: null,
-    pointerDown: false,
+    playerList: [],
+    playerTrackBitmapData: null,
     positionFromClient: null,
     nextDirectionFromClient: {x: 0, y: 0},
+    colorList: ['#2cc36b', '#f1c40f', '#1abc9c', '#9b59b6', '#e74c3c', '#e67e22', '#3498db'],
     socket: null,
+    counter: 0.1,
+    getPlayerById: function(id){
+        id = id || 'unique';
+        //console.log('ID = ', id);
+        for(var i=0; i < this.playerList.length; i++){
+            if(this.playerList[i].id === id){
+                return this.playerList[i];
+            }
+        }
+        var sprite = game.make.sprite(game.width / 2, game.height / 2, 'Dall');
+        sprite.anchor.set(0.5);
+        var playersCount = this.playerList.length;
+        this.savePlayerToList(new Player(id, sprite, game.width/2, game.height/2, this.colorList[playersCount+1]));
+        return this.playerList[this.playerList.length-1];
+    },
+    savePlayerToList: function(player){
+        this.playerList.push(player);
+    },
+    registerClient: function(data){
+
+    },
+    processGyroData: function(data){
+        var gyroObject = this.getObjectFromGyroString(data);
+        //console.log(this.playerList);
+        var currentPlayer = this.getPlayerById(gyroObject.id);
+        currentPlayer.direction = this.getDirectionFromGyroData(gyroObject);
+        //console.clear();
+        //console.log(data);
+    },
+    onMessageSocketCallback: function (event) {
+        this.registerClient(event.data);
+        this.processGyroData(event.data);
+    },
     socketStart: function () {
-        var self = this;
         var url = "ws://" + location.host + "/chatsocket";
         this.socket = new WebSocket(url);
-        this.socket.onmessage = function (event) {
-            self.positionFromClient = self.getObjectFromGyroString(event.data);
-            self.nextDirectionFromClient = self.getDirectionFromGyroData();
-            console.clear();
-            console.log(self.nextDirectionFromClient);
-            console.log(event.data);
-        }
+        this.socket.onmessage = this.onMessageSocketCallback.bind(this);
     },
     getObjectFromGyroString: function (gyroData) {
         return JSON.parse(gyroData);
     },
-    getDirectionFromGyroData: function () {
-        var beta = this.positionFromClient.beta;
-        var gamma = this.positionFromClient.gamma;
+    getDirectionFromGyroData: function (gyroObject) {
+        var beta = gyroObject.beta || 0;
+        var gamma = gyroObject.gamma || 0;
         var startPoint = new Point(0, 0);
         var endPoint = new Point(beta, -gamma);
         var vector = new Vector(startPoint, endPoint);
@@ -38,60 +63,32 @@ var playState = {
             game.add.plugin(Phaser.Plugin.Inspector);
         }
 
-        //	This is the sprite we're going to be drawing onto the BitmapData
-        //	We use game.make because we don't need it displayed, we just need it to exist
         this.sprite = game.make.sprite(game.width / 2, game.height / 2, 'Dall');
         this.sprite.anchor.set(0.5);
 
         //	Note that any properties you set here will be replicated when the Sprite is drawn
         // loop.scale.set(2);
 
-        //	This is the BitmapData we're going to be drawing to
-
-        this.snakeBmd = game.add.bitmapData(game.width, game.height);
-        this.bmd = game.add.bitmapData(200, 200);
-
-        //this.bmd.addToWorld();
-        game.add.sprite(30, game.height - 240, this.bmd);
-        this.snakeBmd.addToWorld();
-        //game.add.sprite(0,0, this.bmd);
+        this.playerTrackBitmapData = game.add.bitmapData(game.width, game.height);
+        //this.playerTrackBitmapData.addToWorld();
+        game.add.sprite(0, 0, this.playerTrackBitmapData);
 
         //	Disables anti-aliasing when we draw sprites to the BitmapData
-        this.bmd.smoothed = false;
-
-        //game.input.addMoveCallback(this.paint, this);
     },
 
     update: function () {
-        this.sprite.x += this.nextDirectionFromClient.x;
-        this.sprite.y += this.nextDirectionFromClient.y;
-        this.snakeBmd.draw(this.sprite, this.sprite.x, this.sprite.y);
-    },
+        this.playerTrackBitmapData.clear();
+        for(var i = 0; i < this.playerList.length; i++){
+            var player = this.playerList[i];
+            //console.log(player.direction);
+            player.position.x += player.direction.x;
+            player.position.y += player.direction.y;
+            //this.playerTrackBitmapData.draw(player.sprite, player.sprite.x, player.sprite.y);
+            console.log(player.position.x, player.position.y, player.color);
 
-    paint: function (pointer, x, y) {
-        //console.log(pointer);
-        this.bmd.clear();
+            this.playerTrackBitmapData.circle(player.position.x, player.position.y, 15, player.color);
 
-        this.bmd.circle(100, 100, 100, 'rgba(255,255,255,1)');
-        if (pointer.isDown) {
-            this.pointerDown = true;
-            var startPoint = new Point(pointer.positionDown.x, pointer.positionDown.y);
-            var endPoint = new Point(x, y);
-
-            var vector = new Vector(startPoint, endPoint);
-            var direction = vector.normalize();
-            this.currentDirection = direction;
-            console.log(this.sprite.x);
-
-            this.sprite.x += direction.x;
-            this.sprite.y += direction.y;
-            //this.bmd.circle(x, y, 20, 'red');
-        } else {
-            this.pointerDown = false;
+            //console.log(player.position);
         }
-        /*} else if(this.currentDirection !== null){
-         this.sprite.x += this.currentDirection.x;
-         this.sprite.y += this.currentDirection.y;
-         }*/
     }
 };
