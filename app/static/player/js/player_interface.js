@@ -179,7 +179,7 @@ var updater = {
         output = {
             beta: ev.deltaX,
             gamma: -ev.deltaY,
-        }
+        };
 	    logEvent(ev);
 	    requestElementUpdate();
 	}

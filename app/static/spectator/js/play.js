@@ -4,21 +4,19 @@ var playState = {
     playerTrackBitmapData: null,
     positionFromClient: null,
     nextDirectionFromClient: {x: 0, y: 0},
-    colorList: ['#2cc36b', '#f1c40f', '#1abc9c', '#9b59b6', '#e74c3c', '#e67e22', '#3498db'],
+    colorList: ['ball-red', 'ball-blue', 'ball-green', 'ball-orange', 'ball-pink', 'ball-purple'],
     socket: null,
-    counter: 0.1,
-    getPlayerById: function (id) {
-        id = id || 'unique';
-        //console.log('ID = ', id);
+    getPlayerById: function (gyro) {
+        var id = gyro.id;
         for (var i = 0; i < this.playerList.length; i++) {
             if (this.playerList[i].id === id) {
                 return this.playerList[i];
             }
         }
-        var sprite = game.make.sprite(game.width / 2, game.height / 2, 'Dall');
+        var colorIndex = this.playerList.length % this.colorList.length;
+        var sprite = game.make.sprite(game.width / 2, game.height / 2, this.colorList[colorIndex]);
         sprite.anchor.set(0.5);
-        var playersCount = this.playerList.length;
-        this.savePlayerToList(new Player(id, sprite, game.width / 2, game.height / 2, this.colorList[playersCount + 1]));
+        this.savePlayerToList(new Player(id, sprite, game.width / 2, game.height / 2, null, gyro));
         return this.playerList[this.playerList.length - 1];
     },
     savePlayerToList: function (player) {
@@ -31,8 +29,11 @@ var playState = {
     },
     processGyroData: function (data) {
         var gyroObject = this.getObjectFromGyroString(data);
-        //console.log(this.playerList);
-        var currentPlayer = this.getPlayerById(gyroObject.id);
+        if(gyroObject.type === 'join'){
+            return;
+        }
+        //.log(this.gyroObject);
+        var currentPlayer = this.getPlayerById(gyroObject);
         currentPlayer.direction = this.getDirectionFromGyroData(gyroObject);
         //console.clear();
         //console.log(data);
@@ -47,6 +48,7 @@ var playState = {
         this.socket.onmessage = this.onMessageSocketCallback.bind(this);
     },
     getObjectFromGyroString: function (gyroData) {
+        //console.log(gyroData);
         return JSON.parse(gyroData);
     },
     getDirectionFromGyroData: function (gyroObject) {
@@ -65,8 +67,8 @@ var playState = {
             game.add.plugin(Phaser.Plugin.Inspector);
         }
 
-        this.sprite = game.make.sprite(game.width / 2, game.height / 2, 'Dall');
-        this.sprite.anchor.set(0.5);
+        //this.sprite = game.make.sprite(game.width / 2, game.height / 2, 'Dall');
+        //this.sprite.anchor.set(0.5);
 
         //	Note that any properties you set here will be replicated when the Sprite is drawn
         // loop.scale.set(2);
@@ -79,16 +81,24 @@ var playState = {
     },
 
     update: function () {
-        this.playerTrackBitmapData.clear();
+        //console.log(this.playerList);
+        //this.playerTrackBitmapData.clear();
+        console.clear();
         for (var i = 0; i < this.playerList.length; i++) {
+
             var player = this.playerList[i];
+
+
+            console.log(player.position, player.gyroObject);
+
             //console.log(player.direction);
             player.position.x += player.direction.x;
             player.position.y += player.direction.y;
-            //this.playerTrackBitmapData.draw(player.sprite, player.sprite.x, player.sprite.y);
-            console.log(player.position.x, player.position.y, player.color);
+            this.playerTrackBitmapData.draw(player.sprite, player.position.x, player.position.y);
+            //this.playerTrackBitmapData.draw(player.sprite, 0, 0);
+            //console.log(player.position.x, player.position.y, player.color);
 
-            this.playerTrackBitmapData.circle(player.position.x, player.position.y, 15, player.color);
+            //this.playerTrackBitmapData.circle(player.position.x, player.position.y, 15, player.color);
 
             //console.log(player.position);
         }

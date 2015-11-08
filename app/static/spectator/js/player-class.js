@@ -1,4 +1,4 @@
-function Player(id, sprite, x, y, color){
+function Player(id, sprite, x, y, color, gyro){
     this.id = id;
     this.trackSegmentLength = 50;
     this.sprite = sprite;
@@ -7,6 +7,7 @@ function Player(id, sprite, x, y, color){
     this.direction = new Point(x, y);
     this.trackPoints = [];
     this.lastTrackPoint = new Point(x, y);
+    this.gyroObject = gyro;
     this.setLastTrackPoint = function(p){
         this.lastTrackPoint = new Point(p.x, p.y);
     };

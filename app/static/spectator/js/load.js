@@ -11,7 +11,12 @@ var loadState = {
         var loadingLabel = game.add.text(80, 150, 'loading...', {font: '30px Courier', fill: '#fff'});
 
         //Load your images, spritesheets, bitmaps...
-        game.load.image('Dall', 'static/spectator/assets/img/dall.png');
+        game.load.image('ball-red', 'static/spectator/assets/img/ball-red.png');
+        game.load.image('ball-blue', 'static/spectator/assets/img/ball-blue.png');
+        game.load.image('ball-green', 'static/spectator/assets/img/ball-green.png');
+        game.load.image('ball-orange', 'static/spectator/assets/img/ball-orange.png');
+        game.load.image('ball-pink', 'static/spectator/assets/img/ball-pink.png');
+        game.load.image('ball-purple', 'static/spectator/assets/img/ball-purple.png');
 
 
         //Load your sounds, efx, music...
