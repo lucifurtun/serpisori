@@ -8,6 +8,7 @@ function Player(id, sprite, x, y, color, gyro){
     this.trackPoints = [];
     this.lastTrackPoint = new Point(x, y);
     this.gyroObject = gyro;
+    this.step = 2.3;
     this.setLastTrackPoint = function(p){
         this.lastTrackPoint = new Point(p.x, p.y);
     };

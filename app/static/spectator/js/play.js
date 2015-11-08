@@ -92,8 +92,8 @@ var playState = {
             console.log(player.position, player.gyroObject);
 
             //console.log(player.direction);
-            player.position.x += player.direction.x;
-            player.position.y += player.direction.y;
+            player.position.x += player.direction.x*player.step;
+            player.position.y += player.direction.y*player.step;
             this.playerTrackBitmapData.draw(player.sprite, player.position.x, player.position.y);
             //this.playerTrackBitmapData.draw(player.sprite, 0, 0);
             //console.log(player.position.x, player.position.y, player.color);
