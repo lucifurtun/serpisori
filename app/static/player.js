@@ -1,16 +1,15 @@
 $(document).ready(function() {
-
-    //if(!gyro.hasFeature('gyro')) {
-    //    window.location = '/player-interface';
-    //}
-
-    updater.start();
-    gyro.frequency = 100;
     var output = null;
+    gyro.frequency = 100;
     gyro.startTracking(function(o) {
         output = o;
+        if(!o.beta  || !o.gamma ) {
+            window.location = '/player-interface';
+        }
         return false;
     });
+
+    updater.start();
 
     setInterval(function(){
         sendCoordinates(output);
