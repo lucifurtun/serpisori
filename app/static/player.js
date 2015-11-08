@@ -1,4 +1,9 @@
 $(document).ready(function() {
+
+    //if(!gyro.hasFeature('gyro')) {
+    //    window.location = '/player-interface';
+    //}
+
     updater.start();
     gyro.frequency = 100;
     var output = null;

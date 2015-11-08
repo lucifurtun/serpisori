@@ -38,6 +38,7 @@ class Application(tornado.web.Application):
             (r"/chatsocket", ChatSocketHandler),
             (r"/player", PlayerHandler),
             (r"/spectator", SpectatorHandler),
+            (r"/player-interface", PlayerInterfaceHandler),
         ]
         return handlers
 
@@ -50,6 +51,10 @@ class PlayerHandler(tornado.web.RequestHandler):
 class SpectatorHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("spectator.html", messages=ChatSocketHandler.cache)
+
+class PlayerInterfaceHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("player_interface.html", messages=ChatSocketHandler.cache)
 
 
 class ChatSocketHandler(tornado.websocket.WebSocketHandler):
