@@ -1,10 +1,5 @@
 $(document).ready(function () {
 
-    //if(!gyro.hasFeature('gyro')) {
-    //    window.location = '/player-interface';
-    //}
-
-    updater.start();
     gyro.frequency = 100;
     var output = null;
     gyro.startTracking(function (o) {
@@ -20,6 +15,8 @@ $(document).ready(function () {
     setInterval(function () {
         sendData(output);
     }, 100);
+
+    updater.start();
 });
 
 function sendData(o) {
