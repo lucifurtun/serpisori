@@ -7,27 +7,29 @@ var playState = {
     colorList: ['#2cc36b', '#f1c40f', '#1abc9c', '#9b59b6', '#e74c3c', '#e67e22', '#3498db'],
     socket: null,
     counter: 0.1,
-    getPlayerById: function(id){
+    getPlayerById: function (id) {
         id = id || 'unique';
         //console.log('ID = ', id);
-        for(var i=0; i < this.playerList.length; i++){
-            if(this.playerList[i].id === id){
+        for (var i = 0; i < this.playerList.length; i++) {
+            if (this.playerList[i].id === id) {
                 return this.playerList[i];
             }
         }
         var sprite = game.make.sprite(game.width / 2, game.height / 2, 'Dall');
         sprite.anchor.set(0.5);
         var playersCount = this.playerList.length;
-        this.savePlayerToList(new Player(id, sprite, game.width/2, game.height/2, this.colorList[playersCount+1]));
-        return this.playerList[this.playerList.length-1];
+        this.savePlayerToList(new Player(id, sprite, game.width / 2, game.height / 2, this.colorList[playersCount + 1]));
+        return this.playerList[this.playerList.length - 1];
     },
-    savePlayerToList: function(player){
+    savePlayerToList: function (player) {
         this.playerList.push(player);
     },
-    registerClient: function(data){
-
+    registerClient: function (data) {
+        //if ("join" === data.type) {
+        //    this.savePlayerToList(new Player(data.id, null, game.width / 2, game.height / 2, this.colorList[playersCount + 1]));
+        //}
     },
-    processGyroData: function(data){
+    processGyroData: function (data) {
         var gyroObject = this.getObjectFromGyroString(data);
         //console.log(this.playerList);
         var currentPlayer = this.getPlayerById(gyroObject.id);
@@ -78,7 +80,7 @@ var playState = {
 
     update: function () {
         this.playerTrackBitmapData.clear();
-        for(var i = 0; i < this.playerList.length; i++){
+        for (var i = 0; i < this.playerList.length; i++) {
             var player = this.playerList[i];
             //console.log(player.direction);
             player.position.x += player.direction.x;
