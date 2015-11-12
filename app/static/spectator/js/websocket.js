@@ -1,16 +1,15 @@
-var updater = {
+var websocket = {
     socket: null,
 
-    start: function() {
+    socketStart: function() {
         var url = "ws://" + location.host + "/chatsocket";
-        updater.socket = new WebSocket(url);
-        updater.socket.onmessage = function(event) {
-            updater.showMessage(event.data);
+        this.socket = new WebSocket(url);
+        this.socket.onmessage = function(event) {
+            websocket.showMessage(event.data);
         }
     },
 
-    showMessage: function(message) {
-        console.clear();
-        console.log(message);
+    showMessage: function(data) {
+        gameObj.processGyroData(data);
     }
 };

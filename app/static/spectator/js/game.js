@@ -1,97 +1,76 @@
-(function () {
+var gameObj = {
+    playerList : [],
+    playerSpritesList : [],
+    playerTrackBitmapData: null,
+    playerTrackSprite: null,
+    positionFromClient: null,
+    nextDirectionFromClient: {x: 0, y: 0},
+    colorList: ['#ff00aa', '#2ecc71', '#e74c3c', '#f1c40f', '#9b59b6', '#3498db', '#ecf0f1', '#7f8c8d'],
+    socket: null,
+    playersTrackSpriteGroup: null,
+    getNewPlayerInstance: function (gyro) {
+        var id = gyro.id;
+        var index = this.playerList.length;
+        var colorIndex = this.playerList.length % this.colorList.length;
 
-    var canvas = document.createElement('canvas');
-    var context = canvas.getContext('2d');
-    var counter = 0;
+        var newPlayer = new Player(
+            id,
+            game.width / 2,
+            game.height / 2,
+            this.colorList[colorIndex],
+            gyro,
+            index
+        );
 
-    var width = canvas.width = 800;
-    var height = canvas.height = 400;
+        this.savePlayerToList(newPlayer);
 
-    var body = document.getElementsByTagName('body')[0];
-
-    body.appendChild(canvas);
-
-    var clearCanvas = function () {
-        context.fillStyle = '#000';
-        context.fillRect(0, 0, width, height);
-    };
-
-    var drawFrames = function () {
-        context.font = "30px Arial";
-        context.fillText("" + counter, 10, 50);
-        counter++;
-    };
-
-    var dot = {
-        width: 10,
-        height: 10,
-        color: '#ff0000',
-        moveDirection: "right",
-        position: {
-            x: 0,
-            y: 0
-        },
-
-        updatePosition: function () {
-            switch (this.moveDirection) {
-                case 'left':
-                    this.position.x--;
-                    break;
-                case 'right':
-                    this.position.x++;
-                    break;
-                case 'up':
-                    this.position.y--;
-                    break;
-                case 'down':
-                    this.position.y++;
-                    break;
-
+        return newPlayer
+    },
+    getPlayerById: function (gyro) {
+        var id = gyro.id;
+        for (var i = 0; i < this.playerList.length; i++) {
+            if (this.playerList[i].id === id) {
+                return this.playerList[i];
             }
-        },
-
-        render: function () {
-            this.updatePosition();
-            context.fillStyle = this.color;
-            context.fillRect(this.position.x, this.position.y, this.width, this.height);
         }
-    };
-
-    document.onkeydown = function (e) {
-        e.preventDefault();
-        console.log(e.keyCode);
-        switch (e.keyCode) {
-            case 37:
-                dot.moveDirection = "left";
-                break;
-            case 39:
-                dot.moveDirection = "right";
-                break;
-            case 38:
-                dot.moveDirection = "up";
-                break;
-            case 40:
-                dot.moveDirection = "down";
-                break;
+        return this.getNewPlayerInstance(gyro);
+    },
+    savePlayerToList: function (player) {
+        this.playerList.push(player);
+    },
+    registerClient: function (data) {
+        //if ("join" === data.type) {
+        //    this.savePlayerToList(new Player(data.id, null, game.width / 2, game.height / 2, this.colorList[playersCount + 1]));
+        //}
+    },
+    processGyroData: function (data) {
+        var gyroObject = this.getObjectFromGyroString(data);
+        var currentPlayer;
+        if (gyroObject.type === 'join') {
+            return;
         }
+        currentPlayer = this.getPlayerById(gyroObject);
+        currentPlayer.direction = this.getDirectionFromGyroData(gyroObject);
+    },
+    onMessageSocketCallback: function (event) {
+        this.registerClient(event.data);
+        this.processGyroData(event.data);
+    },
+    socketStart: function () {
+        var url = "ws://" + location.host + "/chatsocket";
+        this.socket = new WebSocket(url);
+        this.socket.onmessage = this.onMessageSocketCallback.bind(this);
+    },
+    getObjectFromGyroString: function (gyroData) {
+        return JSON.parse(gyroData);
+    },
+    getDirectionFromGyroData: function (gyroObject) {
+        var beta = gyroObject.beta || 0;
+        var gamma = gyroObject.gamma || 0;
+        var startPoint = new Point(0, 0);
+        var endPoint = new Point(beta, -gamma);
+        var vector = new Vector(startPoint, endPoint);
 
-        console.log(dot.position);
-    };
-
-    var render = function () {
-        clearCanvas();
-        dot.render();
-        drawFrames();
-    };
-
-    setTimeout(function () {
-
-        (function animloop() {
-            window.requestAnimationFrame(animloop);
-            render();
-        })();
-
-    }, 100);
-
-})();
-
+        return vector.normalize();
+    }
+};
