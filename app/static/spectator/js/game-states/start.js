@@ -5,6 +5,13 @@ var startState = {
     activePlayers: [],
     playersBmd: null,
     playersSprite: null,
+    startButtonSprite: null,
+    startButtonClickHandler: function(){
+        if (gameObj.playerList.length >= 1) {
+            gameObj.currentState = 'play';
+            game.state.start('play');
+        }
+    },
     preload: function () {
 
         //Load your images, spritesheets, bitmaps...
@@ -22,6 +29,13 @@ var startState = {
         this.playersBmd = game.add.bitmapData(game.width, game.height);
         this.playersBmd.text('Waiting for players ...', 80, 150, '30px Courier', '#fff');
         this.playersSprite = game.add.sprite(0, 0, this.playersBmd);
+
+        var startBtnBmd = game.add.bitmapData(300, 60);
+        startBtnBmd.rect(0, 0, 300, 60, '#f39c12');
+        startBtnBmd.text('START', 100, 40, '30px Arial', '#fff');
+        this.startButtonSprite = game.add.sprite( game.width/2-150, 600, startBtnBmd);
+        this.startButtonSprite.inputEnabled = true;
+        this.startButtonSprite.events.onInputDown.add(this.startButtonClickHandler, this);
     },
 
     update: function () {
@@ -31,9 +45,6 @@ var startState = {
                 this.playersBmd.text(gameObj.playerList[i].id, 80, 250+(60*i), '30px Courier', '#fff');
                 this.playersBmd.dirty = true;
             }
-        }
-        if (gameObj.playerList.length >= 3) {
-            game.state.start('play');
         }
     }
 };

@@ -1,6 +1,6 @@
 var gameObj = {
-    playerList : [],
-    playerSpritesList : [],
+    playerList: [],
+    playerSpritesList: [],
     playerTrackBitmapData: null,
     playerTrackSprite: null,
     positionFromClient: null,
@@ -8,6 +8,7 @@ var gameObj = {
     colorList: ['#ff00aa', '#2ecc71', '#e74c3c', '#f1c40f', '#9b59b6', '#3498db', '#ecf0f1', '#7f8c8d'],
     socket: null,
     playersTrackSpriteGroup: null,
+    currentState: null,
     getNewPlayerInstance: function (gyro) {
         var id = gyro.id;
         var index = this.playerList.length;
@@ -33,7 +34,13 @@ var gameObj = {
                 return this.playerList[i];
             }
         }
-        return this.getNewPlayerInstance(gyro);
+        var newPlayer = this.getNewPlayerInstance(gyro);
+        //newPlayer.direction = this.getDirectionFromGyroData(gyro);
+
+        if (this.currentState == 'play') {
+            return;
+        }
+        return newPlayer;
     },
     savePlayerToList: function (player) {
         this.playerList.push(player);
@@ -49,6 +56,7 @@ var gameObj = {
         if (gyroObject.type === 'join') {
             return;
         }
+
         currentPlayer = this.getPlayerById(gyroObject);
         currentPlayer.direction = this.getDirectionFromGyroData(gyroObject);
     },

@@ -31,14 +31,15 @@ function sendData(o) {
 
 var updater = {
     socket: null,
-    playerId: null,
+    playerId: localStorage.getItem('playerId'),
 
     start: function () {
         var url = "ws://" + location.host + "/chatsocket";
         updater.socket = new WebSocket(url);
         updater.socket.onmessage = function (event) {
             var data = JSON.parse(event.data);
-            if ("join" === data.type) {
+            if ("join" === data.type && updater.playerId === null) {
+                localStorage.setItem('playerId', data.id);
                 updater.playerId = data.id;
             }
         };
