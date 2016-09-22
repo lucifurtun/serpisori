@@ -1,11 +1,11 @@
-# serpisori
 Multiplayer snake game - experiment.
+------------------------------------
 
-Join at:
+`șerpișori - from Romanian, means "little snakes"`
 
-# http://serpisori.sensidev.com
-
-
+1. Use a desktop/laptop browser to watch the game board at http://serpisori.sensidev.com/spectator
+1. Use your mobile phone's browser to join at http://serpisori.sensidev.com
+2. Use your phone's gyro to control your dot.
 
 # Vagrant environment
 
@@ -26,6 +26,11 @@ We decided to use vagrant here to be able to quickly install a production like e
 7. `sudo /vagrant/bin/install_vagrant.sh`
 8. That's it :)
 
+## TODO
 
+- Implement colision mecanics
+- Player names
+- Scoring and gameification
+- Fancy animation to make it look better
 
 
