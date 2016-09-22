@@ -1,5 +1,5 @@
 Multiplayer snake game - experiment.
-------------------------------------
+====================================
 
 `șerpișori - from Romanian, means "little snakes"`
 
